@@ -1,7 +1,8 @@
+import cors from "cors";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import playground_db from "./models/database";
+import playground_db from "./models/database.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,13 +31,13 @@ const connect = async () => {
     await playground_db.authenticate();
     console.log("Database connected successfully.");
     await playground_db.sync({ alter: true });
-    console.log("Database synchronized (tables ensured).");
+    console.log("Database  synchronized (tables ensured).");
   } catch (error) {
     console.error("Unable to connect to or sync database:", error);
   }
 };
 
-connect();
+// connect();
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, ".", "build", "index.html"));
