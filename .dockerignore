@@ -1,0 +1,11 @@
+# Node modules (install fresh in container)
+node_modules
+
+# Local build files
+build
+
+# VSCode config
+.vscode
+
+# Git
+.git
