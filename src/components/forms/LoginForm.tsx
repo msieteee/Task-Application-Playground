@@ -90,8 +90,6 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
     };
 
     try {
-      // Clear inputs
-
       await onSubmit(formData);
 
       usernameRef.current!.value = "";

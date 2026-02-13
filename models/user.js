@@ -13,12 +13,10 @@ const User = playground_db.define(
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
     },
     email: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      unique: true,
       validate: { isEmail: true },
     },
     username: {

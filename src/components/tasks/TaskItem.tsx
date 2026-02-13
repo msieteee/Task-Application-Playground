@@ -6,7 +6,9 @@ import InputField from "../InputField";
 interface TaskItemProps {
   task: string;
   taskId: number;
-  userId: number;
+
+  onDelete: (task: { taskId: number }) => Promise<any>;
+  onUpdate: (task: { taskId: number; task: string }) => Promise<any>;
 }
 
 const TaskItemContainer = styled.div({
@@ -35,7 +37,7 @@ const ButtonWrapper = styled.div({
 });
 
 const buttonBaseStyle = {
-  margin: "0px",
+  margin: 0,
   fontSize: "12px",
   padding: "10px",
 };
@@ -46,24 +48,28 @@ const deleteButtonStyle = {
   backgroundColor: "#C51E3A",
 };
 
-const TaskItem = ({ task, taskId, userId }: TaskItemProps) => {
+const TaskItem = ({ task, taskId, onDelete, onUpdate }: TaskItemProps) => {
   const [editMode, setEditMode] = useState(false);
   const taskRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = () => {
-    console.log("Delete task:", taskId);
+    try {
+      console.log("Delete task:", taskId);
+      onDelete({ taskId });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const handleUpdate = async () => {
-    const updatedValue = taskRef.current?.value?.trim();
+  const handleUpdate = () => {
+    try {
+      const updatedValue = taskRef.current?.value.trim();
+      if (!updatedValue) return;
 
-    if (!updatedValue) return;
-
-    console.log("Update task:", {
-      taskId,
-      userId,
-      value: updatedValue,
-    });
+      onUpdate({ taskId, task: updatedValue });
+    } catch (err) {
+      console.log(err);
+    }
 
     setEditMode(false);
   };
@@ -78,9 +84,7 @@ const TaskItem = ({ task, taskId, userId }: TaskItemProps) => {
           type="text"
           defaultValue={task}
           placeholder={task}
-          inputStyles={{
-            fontSize: "14px",
-          }}
+          inputStyles={{ fontSize: "14px" }}
         />
       )}
 
@@ -104,8 +108,8 @@ const TaskItem = ({ task, taskId, userId }: TaskItemProps) => {
           <Button
             label="Save"
             type="button"
-            buttonStyles={buttonBaseStyle}
             onClick={handleUpdate}
+            buttonStyles={buttonBaseStyle}
           />
         )}
       </ButtonWrapper>
