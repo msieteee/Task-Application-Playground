@@ -1,8 +1,13 @@
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { API_BASE } from "../common/enum";
 import Button from "../components/Button";
 import LoginForm from "../components/forms/LoginForm";
+import SignUpForm from "../components/forms/SignUpForm";
+import { AuthContext } from "../context/AuthContext";
 
-const LoginPage = styled.div({
+const LoginParentContainer = styled.div({
   display: "flex",
   height: "100%",
   width: "100%",
@@ -34,38 +39,93 @@ const Divider = styled.div({
   width: "80%",
   borderRadius: "5px",
 
-  background: "#9e9e9e",
+  background: "#cecece",
 });
 
-const Login = () => {
-  const loginHandler = () => {};
+const buttonStyles = {
+  width: "60%",
+  maxWidth: "60%",
+  height: "40px",
 
-  const Form = <LoginForm onSubmit={loginHandler} />;
+  fontSize: "12px",
+
+  color: "#4e4e4e",
+  border: "solid 1px #9e9e9e",
+  borderRadius: "20px",
+  backgroundColor: "transparent",
+};
+
+const LoginPage = () => {
+  const [loginForm, setLoginForm] = useState(true);
+  const navigate = useNavigate();
+
+  const { loginUser } = useContext(AuthContext);
+
+  const loginHandler = async ({ username, password }) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+
+      const data = await res.json();
+
+      loginUser(data.user, data.token);
+
+      navigate("/tasks");
+    } catch (err) {
+      throw new Error(err.message || "Login request failed");
+    }
+  };
+
+  const registerHandler = async ({ name, email, username, password }) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, username, password }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Sign Up failed");
+      }
+    } catch (err) {
+      throw new Error(err.message || "Sign Up request failed");
+    }
+  };
+
+  const Form = loginForm ? (
+    <LoginForm onSubmit={loginHandler} />
+  ) : (
+    <SignUpForm onSubmit={registerHandler} />
+  );
+
   const FormButton = (
     <Button
-      label="Create new account"
-      onClick={() => {}}
-      buttonStyles={{
-        width: "60%",
-        maxWidth: "60%",
-        height: "40px",
-
-        fontSize: "12px",
-
-        backgroundColor: "none",
+      label={loginForm ? "Create new account" : "Sign in to your account"}
+      onClick={() => {
+        setLoginForm(!loginForm);
       }}
+      buttonStyles={buttonStyles}
     />
   );
 
   return (
-    <LoginPage>
+    <LoginParentContainer>
       <LoginPageContainer>
         {Form}
         <Divider />
         {FormButton}
       </LoginPageContainer>
-    </LoginPage>
+    </LoginParentContainer>
   );
 };
 
-export default Login;
+export default LoginPage;

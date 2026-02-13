@@ -1,8 +1,8 @@
 import { Sequelize } from "sequelize";
 
 const playground_db = new Sequelize("task_playground", "root", "password", {
-  host: process.env.DB_HOST || "127.0.0.1",
-  port: process.env.DB_PORT || 3306,
+  host: "127.0.0.1",
+  port: 3306,
   dialect: "mysql",
   pool: {
     min: 0,

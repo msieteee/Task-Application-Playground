@@ -1,3 +1,4 @@
+import React from "react";
 import styled from "styled-components";
 
 interface ObjectStyle {
@@ -5,55 +6,59 @@ interface ObjectStyle {
 }
 
 interface InputFieldProps {
-  inputRef: React.RefObject<HTMLInputElement>;
-  type: string;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+  type?: string;
   defaultValue?: string;
   label?: string;
-  onChange?: (e) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder: string;
   inputStyles?: ObjectStyle;
   isError?: boolean;
   maxLength?: number;
 }
 
-interface InputProps {
+interface StyledInputProps {
   styles?: ObjectStyle;
   isError?: boolean;
 }
 
-const StyledInput = styled.input(({ styles, isError = false }: InputProps) => {
-  const errorStyles = isError
-    ? {
-        borderColor: "#D55B5B",
-        boxShadow: `0 0 0 2px #F8E7E7`,
-      }
-    : {};
+const StyledInput = styled.input<StyledInputProps>(
+  ({ styles = {}, isError = false }) => {
+    const errorStyles = isError
+      ? {
+          borderColor: "#D55B5B",
+          boxShadow: "0 0 0 2px #F8E7E7",
+        }
+      : {};
 
-  return {
-    padding: "8px 12px",
-    fontSize: "14px",
-    border: "1px solid #ddd",
-    borderRadius: "6px",
-    backgroundColor: "#fff",
-    outline: "none",
-    transition: "all 0.2s ease-in-out",
-    "box-sizing": "border-box",
+    return {
+      padding: "8px 12px",
+      fontSize: "14px",
+      border: "1px solid #ddd",
+      borderRadius: "6px",
+      backgroundColor: "#fff",
+      outline: "none",
+      transition: "all 0.2s ease-in-out",
+      boxSizing: "border-box",
+      height: "40px",
+      width: "100%",
 
-    height: "40px",
-    width: "100%",
+      "&:focus": {
+        borderColor: "#1877f2",
+        boxShadow: "0 0 0 2px rgba(24, 119, 242, 0.2)",
+      },
 
-    "&:focus": {
-      borderColor: "#1877f2",
-      boxShadow: "0 0 0 2px rgba(24, 119, 242, 0.2)",
-    },
+      ...errorStyles,
+      ...styles,
+    };
+  },
+);
 
-    ...errorStyles,
-
-    ...styles,
-  };
+const InputLabel = styled.div({
+  maxWidth: "250px",
+  marginBottom: "4px",
+  fontSize: "13px",
 });
-
-const InputLabel = styled.div({ maxWidth: "250px" });
 
 const InputField = ({
   inputRef,
@@ -70,15 +75,15 @@ const InputField = ({
     <>
       {label && <InputLabel>{label}</InputLabel>}
       <StyledInput
-        styles={inputStyles}
         ref={inputRef}
         type={type}
         onChange={onChange}
         defaultValue={defaultValue}
         placeholder={placeholder}
+        styles={inputStyles}
         isError={isError}
         maxLength={maxLength}
-      ></StyledInput>
+      />
     </>
   );
 };
