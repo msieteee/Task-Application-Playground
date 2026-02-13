@@ -14,7 +14,7 @@ The goal of the exercise was to demonstrate my understanding of core frontend co
 
 `docker-compose up --build`
 
-After running `docker-compose up --build`, you can access the backend at http://localhost:3000 and frontend at http://localhost:8080.
+After running `docker-compose up --build`, you can access the site at http://localhost:3000, assuming **MySQL** was ran correctly by the `docker-compose`.
 
 # API Endpoints
 
