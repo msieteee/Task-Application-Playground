@@ -1,0 +1,43 @@
+name: Docker Compose CI
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start containers
+        run: |
+          docker-compose up -d --build
+          # wait for services to initialize
+          sleep 15
+
+      - name: Test MySQL connectivity
+        run: |
+          docker exec task-playground-mysql mysql -uroot -ppassword -e "SHOW DATABASES;" > db_test.log
+          cat db_test.log
+
+      - name: Run app sanity check
+        run: |
+          docker exec task-application-playground sh -c "node -e 'console.log(\"App running and able to reach DB\")'" > app_test.log
+          cat app_test.log
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-logs
+          path: |
+            db_test.log
+            app_test.log
+
+      - name: Tear down
+        run: docker-compose down -v
