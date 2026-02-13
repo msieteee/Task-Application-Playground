@@ -9,28 +9,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # 3️⃣ Build and start containers
       - name: Build and start containers
         run: |
           docker compose up -d --build
-          # wait for services to initialize
+          # Wait a bit for MySQL to be healthy
           sleep 15
 
+      # 4️⃣ Debug: list pages to confirm Login.tsx exists
+      - name: List src/pages
+        run: docker compose run --rm app ls -R /app/src/pages
+
+      # 5️⃣ Test MySQL connectivity
       - name: Test MySQL connectivity
         run: |
           docker exec task-playground-mysql mysql -uroot -ppassword -e "SHOW DATABASES;" > db_test.log
           cat db_test.log
 
+      # 6️⃣ Run app sanity check
       - name: Run app sanity check
         run: |
           docker exec task-application-playground sh -c "node -e 'console.log(\"App running and able to reach DB\")'" > app_test.log
           cat app_test.log
 
+      # 7️⃣ Upload artifacts
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -39,5 +49,6 @@ jobs:
             db_test.log
             app_test.log
 
+      # 8️⃣ Tear down containers
       - name: Tear down
         run: docker compose down -v
