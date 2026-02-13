@@ -2,7 +2,9 @@ name: Docker Compose CI
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
   build-and-test:
@@ -17,7 +19,7 @@ jobs:
 
       - name: Build and start containers
         run: |
-          docker-compose up -d --build
+          docker compose up -d --build
           # wait for services to initialize
           sleep 15
 
@@ -40,4 +42,4 @@ jobs:
             app_test.log
 
       - name: Tear down
-        run: docker-compose down -v
+        run: docker compose down -v
